@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "dist/server.js",  
   "scripts": {
-    "build": "tsc",          
-    "start": "node dist/server.js", 
+    "prestart": "chmod +x node_modules/.bin/ts-node",          
+    "start": "node dist/server.js",
+    "build": "tsc", 
     "dev": "ts-node src/server.ts",   
     "test": "echo \"Error: no test specified\" && exit 1"
   },
