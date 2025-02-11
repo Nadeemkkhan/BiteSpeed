@@ -16,7 +16,7 @@ class IdentifyServiceError extends Error {
 }
 
 interface IdentifyResult {
-    primaryContactId: number | null;
+    primaryContactId: number;
     emails: string[];
     phoneNumbers: string[];
     secondaryContactIds: number[];
@@ -36,11 +36,13 @@ export class IdentifyService {
                     throw new IdentifyServiceError("Email or phoneNumber are required");
                 }
 
-                const existingContacts = await transactionalEntityManager.find(Contact, {
+                // Find all contacts with matching email or phone number
+                const matchingContacts = await transactionalEntityManager.find(Contact, {
                     where: [{ email }, { phoneNumber }],
                 });
 
-                if (existingContacts.length === 0) {
+                if (matchingContacts.length === 0) {
+                    // No existing contact, create a new primary contact
                     const newContact = transactionalEntityManager.create(Contact, {
                         email,
                         phoneNumber,
@@ -56,21 +58,33 @@ export class IdentifyService {
                     };
                 }
 
-                let primaryContact = existingContacts.find(c => c.linkPrecedence === "primary");
+                // Determine the primary contact
+                let primaryContact = matchingContacts.find(c => c.linkPrecedence === "primary");
+
                 if (!primaryContact) {
-                    primaryContact = existingContacts[0];
+                    // If there's no primary, assign the first contact as primary
+                    primaryContact = matchingContacts[0];
                     primaryContact.linkPrecedence = "primary";
                     await transactionalEntityManager.save(primaryContact);
                 }
 
-                const secondaryContacts = existingContacts.filter(c => c.id !== primaryContact.id);
+                // Collect all emails, phone numbers, and secondary contacts
+                const emails = new Set<string>();
+                const phoneNumbers = new Set<string>();
+                const secondaryContactIds: number[] = [];
 
-                const existingEmails = new Set(existingContacts.map(c => c.email).filter(Boolean));
-                const existingPhones = new Set(existingContacts.map(c => c.phoneNumber).filter(Boolean));
+                for (const contact of matchingContacts) {
+                    if (contact.id !== primaryContact.id) {
+                        secondaryContactIds.push(contact.id);
+                    }
+                    if (contact.email) emails.add(contact.email);
+                    if (contact.phoneNumber) phoneNumbers.add(contact.phoneNumber);
+                }
 
+                // If new email or phone is provided, check if it needs to be added as secondary
                 let newSecondaryContact: Contact | undefined;
 
-                if ((email && !existingEmails.has(email)) || (phoneNumber && !existingPhones.has(phoneNumber))) {
+                if ((email && !emails.has(email)) || (phoneNumber && !phoneNumbers.has(phoneNumber))) {
                     newSecondaryContact = transactionalEntityManager.create(Contact, {
                         email,
                         phoneNumber,
@@ -78,23 +92,16 @@ export class IdentifyService {
                         linkPrecedence: "secondary",
                     });
                     await transactionalEntityManager.save(newSecondaryContact);
-                    secondaryContacts.push(newSecondaryContact);
+                    secondaryContactIds.push(newSecondaryContact.id);
+                    if (email) emails.add(email);
+                    if (phoneNumber) phoneNumbers.add(phoneNumber);
                 }
-
-                for (const secondaryContact of secondaryContacts) {
-                    secondaryContact.linkedId = primaryContact.id;
-                    secondaryContact.linkPrecedence = "secondary";
-                    await transactionalEntityManager.save(secondaryContact);
-                }
-
-                const emails = Array.from(new Set([primaryContact.email, ...existingEmails])).filter(Boolean) as string[];
-                const phoneNumbers = Array.from(new Set([primaryContact.phoneNumber, ...existingPhones])).filter(Boolean) as string[];
 
                 return {
                     primaryContactId: primaryContact.id,
-                    emails,
-                    phoneNumbers,
-                    secondaryContactIds: secondaryContacts.map(c => c.id),
+                    emails: Array.from(emails),
+                    phoneNumbers: Array.from(phoneNumbers),
+                    secondaryContactIds,
                 };
             } catch (error) {
                 console.error("❌ Error in identifyCustomer:", error);

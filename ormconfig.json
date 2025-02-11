@@ -4,7 +4,7 @@
     "host": "localhost",
     "port": 3306,
     "username": "root",
-    "password": "Nadeem@257",
+    "password": "yourpassword",
     "database": "your_database_name",
     "entities": ["src/entities/*.ts"],
     "synchronize": true,
