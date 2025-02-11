@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2018",          // Updated target
+    "module": "commonjs",
+    "moduleResolution": "node",   // Added module resolution
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir": "./build",
+    "lib": ["es2018"]            // Ensure correct ES version libs are included
+  }
+}
