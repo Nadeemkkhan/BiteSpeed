@@ -11,17 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-console.log("Creating IdentifyService instance...");
-// const identifyService = new IdentifyService();  REMOVED: Use the imported instance
-console.log("IdentifyService instance created.");
 
-console.log("Loading identifyRoutes...");
 import IdentifyServiceInstance from "./services/identifyService"
 const identifyRouter = identifyRoutes(IdentifyServiceInstance); // Use the imported instance
-console.log("identifyRoutes loaded and router created.");
 
-console.log("✅ Loading identifyRoutes...");
-console.log(`Identify Routes Import Check:`, identifyRoutes);
 
 app.use('/identify', identifyRouter);
 

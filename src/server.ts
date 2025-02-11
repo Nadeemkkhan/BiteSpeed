@@ -4,7 +4,7 @@ import { initializeDatabase } from "./config/database";
 
 const PORT = process.env.PORT || 3000;
 
-console.log("⏳ Attempting to connect to the database...");
+
 
 initializeDatabase()
     .then(() => {

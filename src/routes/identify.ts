@@ -36,7 +36,7 @@ const identifyRoutes = (identifyService: IdentifyService) => {
         }
     });
 
-    console.log("✅ identify.ts router exported");
+   
     return router;
 };
 
