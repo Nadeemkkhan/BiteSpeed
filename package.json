@@ -1,18 +1,13 @@
 {
   "name": "bitespeed",
   "version": "1.0.0",
-  "main": "dist/server.js",  
+  "main": "dist/server.js",
   "scripts": {
-    "postinstall": "chmod +x ./node_modules/.bin/ts-node", 
-    "start": "node dist/server.js",                 
-    "build": "tsc",                                 
-    "dev": "ts-node src/server.ts",                 
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
