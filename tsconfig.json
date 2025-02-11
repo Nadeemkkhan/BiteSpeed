@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2018",          // Updated target
+    "target": "es2020",          // Slightly more recent target (optional)
     "module": "commonjs",
-    "moduleResolution": "node",   // Added module resolution
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -10,6 +10,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "./build",
-    "lib": ["es2018"]            // Ensure correct ES version libs are included
-  }
+    "lib": ["es2020"]            // Match the target
+  },
+  "include": ["src/**/*"],          // Explicitly include source files
+  "exclude": ["node_modules"]       // Explicitly exclude node_modules
 }
